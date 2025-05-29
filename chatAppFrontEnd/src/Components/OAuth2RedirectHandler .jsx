@@ -9,7 +9,7 @@ const OAuth2RedirectHandler = () => {
     const token = urlParams.get("token");
 
     if (token) {
-      localStorage.setItem("chatAppToken", token); 
+      localStorage.setItem("chatAppToken", token);
       navigate("/home");
       window.location.reload();
     } else {

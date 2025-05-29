@@ -3,6 +3,7 @@ package com.chatapp.chatApp;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -12,7 +13,7 @@ public class ChatAppApplication {
 		SpringApplication.run(ChatAppApplication.class, args);
 	}
 	@Bean
-	public RestTemplate restTemplate() {
+    public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
 }

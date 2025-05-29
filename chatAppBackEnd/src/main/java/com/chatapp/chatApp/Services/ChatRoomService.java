@@ -45,7 +45,6 @@ public class ChatRoomService {
         userRepo.save(user);
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
-
     @Transactional
     public void deleteRoom(String roomKey,User user){
         try {
@@ -183,5 +182,9 @@ public class ChatRoomService {
             cloudinary.uploader().destroy(message.get().getPublic_Id(),new HashMap<>());
             messageRepo.deleteById(id);
         }
+    }
+
+    public Optional<ChatRoom> findById(String roomId) {
+        return chatRoomRepo.findById(roomId);
     }
 }

@@ -13,7 +13,7 @@ import Profile from "./Components/profile";
 import AI from "./Components/ai";
 import NavBar from "./Components/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect} from "react";
+import { useEffect, useState } from "react";
 import { connectToAllRooms } from "./Utils/websocket";
 import LoadingImg from "./assets/chatAppLogo.png";
 
@@ -28,7 +28,7 @@ import OAuth2RedirectHandler from "./Components/OAuth2RedirectHandler ";
 
 function App() {
   const token = localStorage.getItem("chatAppToken");
-  const loading=useSelector((state)=>state.chatApp.isLoading);
+  const loading = useSelector((state) => state.chatApp.isLoading);
   const router = createBrowserRouter([
     {
       path: "/",
@@ -36,7 +36,8 @@ function App() {
         <Navigate to="/home" />
       ) : (
         <div>
-          <Login />
+          {!token &&<Login />}
+          
         </div>
       ),
     },
@@ -46,7 +47,8 @@ function App() {
         <Navigate to="/home" />
       ) : (
         <div>
-          <Signup />
+          {!token &&
+          <Signup />}
         </div>
       ),
     },
@@ -145,30 +147,30 @@ function App() {
       }
     };
   }, [roomIds]);
+  const [firstLoading, setFirstLoading] = useState(false);
+
   useEffect(() => {
     if (token) {
-      dispatch(getUserDetail());
+      dispatch(getUserDetail()).then(() => setFirstLoading(true));
     }
   }, [token]);
 
   useEffect(() => {
     if (user?.group) {
       user.group.forEach((group) => {
-        dispatch(getRoomMembers(group?.roomKey));
+        dispatch(getRoomMembers(group?.roomKey)).then(() =>
+          setFirstLoading(false)
+        );
       });
     }
-  }, [user]);
+  }, [user?.group?.member, firstLoading]);
   return (
     <div className="text-white relative w-screen h-screen flex justify-center items-center">
-      <RouterProvider router={router} />
-      {loading && (
-        <div className="absolute left-0 top-0 w-screen h-screen z-99 inset-0 backdrop-blur-md flex justify-center items-center bg-[#020618bf]">
-          <img
-            src={LoadingImg}
-            className="aspect-square object-cover"
-          />
-        </div>
-      )}
+      <div className={`absolute left-0 top-0 w-screen h-screen  inset-0 backdrop-blur-md flex justify-center items-center bg-[#020618bf] ${loading?"z-99":"opacity-0 -z-10"} transition-all duration-1000`}>
+        <img src={LoadingImg} className="aspect-square object-cover" />
+      </div>
+      {!loading &&<RouterProvider router={router} />}
+      
     </div>
   );
 }

@@ -4,6 +4,7 @@ import com.chatapp.chatApp.Entity.AdminRequest;
 import com.chatapp.chatApp.Entity.ChatRoom;
 import com.chatapp.chatApp.Entity.Friends;
 import com.chatapp.chatApp.Entity.User;
+import com.chatapp.chatApp.Repository.ChatRoomRepo;
 import com.chatapp.chatApp.Services.ChatRoomService;
 import com.chatapp.chatApp.Services.ImageService;
 import com.chatapp.chatApp.Services.UserServices;
@@ -31,6 +32,8 @@ public class ChatRoomController {
     private ImageService imageService;
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    ChatRoomRepo chatRoomRepo;
 
     @PostMapping("/create")
     public ResponseEntity<?> createChatRoom(@RequestBody ChatRoom chatRoom){
@@ -135,7 +138,7 @@ public class ChatRoomController {
     @GetMapping("/get/roomMembers")
     public ResponseEntity<?> getRoomMembers(@RequestParam String roomKey){
         SecurityContextHolder.getContext().getAuthentication();
-        Optional<ChatRoom> room=chatRoomService.chatRoomRepo.findById(roomKey);
+        Optional<ChatRoom> room=chatRoomRepo.findById(roomKey);
         Map<ObjectId,Friends> ans=new HashMap<>();
         for(int i=0;i<room.get().getMember().size();i++){
             Optional<User> getUser=userServices.userRepo.findById(new ObjectId(room.get().getMember().get(i)));

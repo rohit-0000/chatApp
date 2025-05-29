@@ -675,7 +675,6 @@ export const chatSlice = createSlice({
         state.isLoading=false;
       })
       .addCase(getRoomMembers.pending, (state, action) => {
-        state.isLoading=true;
       })
       .addCase(makeAdmin.fulfilled, (state, action) => {
         const room = state.user.group.find(

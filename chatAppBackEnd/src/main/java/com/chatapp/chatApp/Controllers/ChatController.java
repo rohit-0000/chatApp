@@ -42,7 +42,7 @@ public class ChatController {
     @MessageMapping("/sendMessage/{roomId}")
     @SendTo("/topic/room/{roomId}")
     public Message sendMessage(@DestinationVariable String roomId, @RequestBody Message message) {
-        Optional<ChatRoom> chatRoom=chatRoomService.chatRoomRepo.findById(roomId);
+        Optional<ChatRoom> chatRoom=chatRoomService.findById(roomId);
         if(!chatRoom.get().getMember().contains(message.getSenderId().toHexString())) return null;
         chatRoomService.sendMessage(roomId, message);
         return message;
@@ -71,7 +71,7 @@ public class ChatController {
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
         String userName=authentication.getName();
         User user=userServices.userRepo.findByUserName(userName);
-        Optional<ChatRoom> chatRoom=chatRoomService.chatRoomRepo.findById(roomKey);
+        Optional<ChatRoom> chatRoom=chatRoomService.findById(roomKey);
         Optional<Message> message=messageRepo.findById(id);
         if(user.getId().equals(message.get().getSenderId()) ||chatRoom.get().getAdmin().contains(user.getId().toHexString())) {
             if(message.get().getPublic_Id()!=null) {
