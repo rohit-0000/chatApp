@@ -3,7 +3,6 @@ package com.chatapp.chatApp.Controllers;
 import com.chatapp.chatApp.Entity.ChatRoom;
 import com.chatapp.chatApp.Entity.Message;
 import com.chatapp.chatApp.Entity.User;
-import com.chatapp.chatApp.Repository.ChatRoomRepo;
 import com.chatapp.chatApp.Repository.MessageRepo;
 import com.chatapp.chatApp.Services.ChatRoomService;
 import com.chatapp.chatApp.Services.ImageService;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -54,9 +51,7 @@ public class ChatController {
     @Transactional
     @PostMapping("/sendChatMedia/{groupId}")
     public ResponseEntity<?> uploadChatFile(@RequestParam("chatFile") MultipartFile chatFile, @RequestPart("message") Message message,@PathVariable String groupId ){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        String userName = authentication.getName();
-        User user=userServices.findByUsername(userName);
+        SecurityContextHolder.getContext().getAuthentication();
 
         try{
             List<String> fileID =imageService.uploadFile(chatFile);

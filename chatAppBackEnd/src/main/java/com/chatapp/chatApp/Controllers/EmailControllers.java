@@ -1,7 +1,6 @@
 package com.chatapp.chatApp.Controllers;
 
 import com.chatapp.chatApp.Entity.EmailRequest;
-import com.chatapp.chatApp.Entity.User;
 import com.chatapp.chatApp.Services.EmailService;
 import com.chatapp.chatApp.Services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
