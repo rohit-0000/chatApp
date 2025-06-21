@@ -84,19 +84,6 @@
 			<artifactId>cloudinary-http44</artifactId>
 			<version>1.36.0</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.cloudinary</groupId>-->
-<!--			<artifactId>cloudinary-http44</artifactId>-->
-<!--			<version>1.36.0</version>-->
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<groupId>commons-logging</groupId>-->
-<!--					<artifactId>commons-logging</artifactId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
-<!--		</dependency>-->
-
-
 
 		<!--		Mail service-->
 		<dependency>
@@ -122,7 +109,8 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20231013</version> </dependency>
+			<version>20231013</version>
+		</dependency>
 	</dependencies>
 
 	<build>

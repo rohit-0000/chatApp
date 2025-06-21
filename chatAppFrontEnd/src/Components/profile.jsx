@@ -131,8 +131,8 @@ const profile = () => {
     dispatch(updateUser(data));
   }
   return (
-    <div className="  w-screen p-2 pl-16">
-      <div className="bg-[#ffffff11] w-full min-h-screen  rounded-xl flex flex-col justify-center items-center md:px-20 py-10 gap-10 ">
+    <div className="  w-screen p-2 pl-16 h-screen">
+      <div className="bg-[#ffffff11] w-full  rounded-xl flex flex-col justify-center items-center md:px-20 py-10 gap-10 min-h-full">
         <label
           className={`cursor-pointer  relative`}
           onMouseEnter={() => {
@@ -145,7 +145,7 @@ const profile = () => {
           <img
             className={` ${
               fullImg
-                ? "w-[95vw] h-[95vw] md:w-[55vw] md:h-[55vw]"
+                ? "w-[85vw] h-[85vw] md:w-[55vw] md:h-[55vw]"
                 : "w-[60vw] h-[60vw] md:w-90 md:h-90"
             }  rounded-xl object-cover transition-all duration-500 ease-linear`}
             src={user.userImageUrl || UserImg}
@@ -341,26 +341,9 @@ const profile = () => {
                       } text-white pl-3 text-2sm w-[250px] py-2 md:text-xl md:w-[350px] lg:text-2xl lg:w-[550px] rounded-md outline-0 pr-10`}
                       defaultValue={user.email}
                       disabled
-                      // {...registerForm2("email", {
-                      //   pattern: {
-                      //     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      //     message: "Enter a valid email id",
-                      //   },
-                      // })}
                     />
-                    {/* <img
-                  src={EditTextImg}
-                  className="absolute right-0 top-1 w-9 cursor-pointer active:scale-85"
-                  onClick={() => {
-                    setEmail(!email);
-                  }}
-                /> */}
+                   
                   </div>
-                  {/* {errorsForm2.email && (
-                <p className="text-red-500 italic absolute pl-2">
-                  {errorsForm2.email.message}
-                </p>
-              )} */}
                 </div>
               </div>
 
