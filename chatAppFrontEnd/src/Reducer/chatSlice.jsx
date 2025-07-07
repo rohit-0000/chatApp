@@ -580,6 +580,7 @@ export const chatSlice = createSlice({
       .addCase(getUserDetail.fulfilled, (state, action) => {
         state.user = action.payload;
         localStorage.setItem("chatAppUserDetail", action.payload);
+        state.isLoading=false;
       })
       .addCase(getUserDetail.pending, (state, action) => {
         state.isLoading=true;

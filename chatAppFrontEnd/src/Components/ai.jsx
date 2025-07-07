@@ -12,6 +12,7 @@ const ai = () => {
   const qna = useSelector((state) => state.chatApp.user)?.aiQna;
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef(null);
+  const name=useSelector((state)=>state.chatApp.user.name);
   function handleSend(e) {
     e.preventDefault();
     setLoading(true);
@@ -32,7 +33,7 @@ const ai = () => {
 
         {/* body  */}
         <div className="h-full overflow-x-hidden flex flex-col-reverse relative ">
-          {qna ? (
+          {Object.keys(qna || {}).length > 0 ? (
             Object.entries(qna)
               .reverse()
               .map(([key,question]) => (
@@ -56,7 +57,10 @@ const ai = () => {
                 </div>
               ))
           ) : (
-            <p className="px-5">No AI QnA available.</p>
+            <div className="px-5 h-full w-full flex flex-col justify-center items-center">
+              <p className="text-4xl font-bold">Hi {name},</p>
+              <p className="text-4xl font-bold text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text"> How can i help You ?</p>
+            </div>
           )}
           {loading &&
           <div className="absolute bottom-0 w-full flex justify-center">
