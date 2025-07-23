@@ -110,7 +110,7 @@ const Home = () => {
   };
 
   // message send
-  function handleSendMessage() {
+  async function handleSendMessage() {
     if (message === "" && file === null) return;
     if (file !== null) {
       const msg = {
@@ -134,7 +134,7 @@ const Home = () => {
       setPreview(null);
       fileInputRef.current.value = "";
 
-      dispatch(
+      await dispatch(
         sendChatMedia({ MediaData: formData, groupId: groupNo, message: msg })
       );
 

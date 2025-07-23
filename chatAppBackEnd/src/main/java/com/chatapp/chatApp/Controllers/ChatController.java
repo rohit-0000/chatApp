@@ -58,7 +58,7 @@ public class ChatController {
             if (fileID.isEmpty()) return new ResponseEntity<>("Error in sending email",HttpStatus.BAD_REQUEST);
             message.setMessage(fileID.get(0));
             message.setPublic_Id(fileID.get(1));
-//            simpMessagingTemplate.convertAndSend("/topic/room/"+groupId,message);
+            simpMessagingTemplate.convertAndSend("/topic/room/"+groupId,message);
             sendMessage(groupId,message);
             return new ResponseEntity<>(HttpStatus.OK);
         }
