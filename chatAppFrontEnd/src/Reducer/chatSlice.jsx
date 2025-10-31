@@ -439,6 +439,30 @@ export const sendChatMedia = createAsyncThunk(
   }
 );
 
+export const sendMessage = createAsyncThunk(
+  "send/message",
+  async ({ roomId, messageObj }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("chatAppToken");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/sendMessage/${roomId}`,
+        messageObj,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (e) {
+      if (e.response) return rejectWithValue(e.response.data);
+      return rejectWithValue("Unexpected error");
+    }
+  }
+);
+
+
 export const makeAdmin = createAsyncThunk(
   "group/makeAdmin",
   async (body, { rejectWithValue }) => {
@@ -704,6 +728,12 @@ export const chatSlice = createSlice({
     })
     .addCase(deleteChat.rejected,()=>{
       toast.error("Some error in deleting");
+    })
+    .addCase(sendMessage.fulfilled,(state,action)=>{
+      toast.success("message sent");
+    })
+    .addCase(sendMessage.rejected,(state,action)=>{
+      toast.success("message not sent 😒");
     })
   },
 });

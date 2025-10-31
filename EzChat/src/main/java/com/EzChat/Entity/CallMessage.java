@@ -1,0 +1,9 @@
+package com.EzChat.Entity;
+
+public class CallMessage {
+    private String senderId;
+    private String targetId;
+    private String type;
+    private String sdp;
+    private String candidate;
+}

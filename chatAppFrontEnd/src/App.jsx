@@ -25,6 +25,7 @@ import {
   getRoomMembers,
 } from "./Reducer/chatSlice";
 import OAuth2RedirectHandler from "./Components/OAuth2RedirectHandler ";
+import { setCallStatus } from "./Reducer/callSlice";
 
 function App() {
   const token = localStorage.getItem("chatAppToken");
@@ -139,6 +140,9 @@ function App() {
       },
       (roomKey) => {
         dispatch(removeChatRoom(roomKey));
+      },
+      (status,roomId) =>{
+        dispatch(setCallStatus({status,roomId}));
       }
     );
     return () => {
@@ -147,6 +151,9 @@ function App() {
       }
     };
   }, [roomIds]);
+
+
+
   const [firstLoading, setFirstLoading] = useState(false);
 
   useEffect(() => {
@@ -170,6 +177,7 @@ function App() {
         <img src={LoadingImg} className="aspect-square object-cover" />
       </div>
       {!loading &&<RouterProvider router={router} />}
+      {/* {!loading && <VideoCall/>} */}
       
     </div>
   );

@@ -8,12 +8,12 @@ import GroupEditImg from "../assets/groupEditImg.svg";
 import defaultUserImg from "../assets/DefaultUser.svg";
 import BackImg from "../assets/backImg.svg";
 import sendImg from "../assets/sendImg.svg";
-import videoCall from "../assets/videoCall.svg";
+import videoCallImg from "../assets/videoCall.svg";
 import audioCall from "../assets/audioCall.svg";
 import CreateGroup from "./createGroup";
 import JoinGroup from "./joinGroup";
 import GroupInfo from "./groupInfo";
-import { sendMessage } from "../Utils/websocket";
+import { sendMessage } from "../Reducer/chatSlice";
 import AddImg from "../assets/addImg.svg";
 import {
   addMessageToGroup,
@@ -30,7 +30,8 @@ import videoPrev from "../assets/videoPrev.svg";
 import audioPrev from "../assets/audioPrev.svg";
 import pdfPrev from "../assets/pdfPrev.svg";
 import filePrev from "../assets/filePrev.svg";
-import Pdf from "react-pdf-js";
+import { startCall } from "../Reducer/callSlice";
+import VideoCall from "./VideoCall/videoCall";
 
 const Home = () => {
   const leftBoxRef = useRef(null);
@@ -61,6 +62,7 @@ const Home = () => {
   const [loading, setLoading] = useState([]);
   const [toDeleteChat, setToDeleteChat] = useState(null);
   const fileInputRef = useRef(null);
+  const call = useSelector((state) => state.call);
 
   useEffect(() => {
     const handleResize = () => setIsSmallScreen(window.innerWidth < 640);
@@ -150,7 +152,7 @@ const Home = () => {
         msgType: "text",
       };
       dispatch(addMessageToGroup({ roomId: groupNo, message: msg }));
-      sendMessage(groupNo, msg);
+      dispatch(sendMessage({ roomId: groupNo, messageObj: msg }));
       setMessage("");
       textareaRef.current.style.height = "auto";
     }
@@ -206,6 +208,13 @@ const Home = () => {
       document.removeEventListener("mousedown", handleClickOutside_GroupInfo);
     };
   }, [roomCreateForm, roomJoinForm, addGroup, OpenGroupInfo]);
+
+  // handle videoCall
+  function handleVideoCall() {
+    if (call.status === 'idle' ) {
+      dispatch(startCall(groupNo));
+    }
+  }
 
   // render Preview
   const renderPreview = () => {
@@ -412,7 +421,7 @@ const Home = () => {
     }
   }
 
-  function showMediaChatPreview(type,grp) {
+  function showMediaChatPreview(type, grp) {
     if (type === "text") {
       return (
         <div className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">
@@ -447,7 +456,7 @@ const Home = () => {
           <p>PDF file</p>
         </div>
       );
-    } else if(type==="unknown"){
+    } else if (type === "unknown") {
       return (
         <div className="flex gap-1">
           <img src={filePrev} className="w-4" />
@@ -485,16 +494,14 @@ const Home = () => {
   }
   return (
     <div
-      className={`overflow-hidden h-screen w-screen ${
-        !fullImg && "p-2"
-      } flex gap-1 relative transition-all duration-400 ease-in`}
+      className={`overflow-hidden h-screen w-screen ${!fullImg && "p-2"
+        } flex gap-1 relative transition-all duration-400 ease-in`}
     >
       <div
-        className={`${
-          fullImg
+        className={`${fullImg
             ? "w-screen h-screen opacity-100 scale-100 left-0"
             : "left-1/2 w-0 h-0 overflow-hidden opacity-0 scale-0 "
-        } bg-slate flex justify-center items-center z-99  backdrop-blur-2xl transition-all duration-500 ease-in-out absolute `}
+          } bg-slate flex justify-center items-center z-99  backdrop-blur-2xl transition-all duration-500 ease-in-out absolute `}
       >
         <img
           src={BackImg}
@@ -510,13 +517,19 @@ const Home = () => {
         />
       </div>
       {/* Main Box */}
-      <div className="flex rounded-2xl h-full w-full overflow-hidden border-white pl-14 gap-0">
+
+      <div className="flex justify-center rounded-2xl h-full w-full overflow-hidden border-white pl-14 gap-0 relative">
+        {/* video call */}
+        {((call.status == "calling") || (call.status == "in-call") || (call.status == "incoming")) && 
+        <div className="absolute z-100">
+          <VideoCall />
+        </div>
+        }
         {/* left Box */}
         <div
           ref={leftBoxRef}
-          className={`h-full  relative rounded-l-2xl bg-[#fff1d53a] ${
-            groupNo !== null && "hidden md:flex"
-          } flex flex-col justify-center gap-2 md:min-w-80 `}
+          className={`h-full  relative rounded-l-2xl bg-[#fff1d53a] ${groupNo !== null && "hidden md:flex"
+            } flex flex-col justify-center gap-2 md:min-w-80 `}
           style={
             !isSmallScreen ? { width: `${sizes.left}vw` } : { width: "100%" }
           }
@@ -600,9 +613,8 @@ const Home = () => {
                     grp && (
                       <div
                         key={index}
-                        className={`flex gap-1 items-center ${
-                          grp.roomKey === groupNo && "bg-slate-900 rounded-xl"
-                        } p-1 transition-all duration-500 ease-out w-full h-18`}
+                        className={`flex gap-1 items-center ${grp.roomKey === groupNo && "bg-slate-900 rounded-xl"
+                          } p-1 transition-all duration-500 ease-out w-full h-18`}
                         onClick={() => {
                           setGroupNo(grp?.roomKey);
                         }}
@@ -618,7 +630,7 @@ const Home = () => {
                           <div className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">
                             <div>
                               {showMediaChatPreview(
-                                grp?.chat[grp.chat.length - 1]?.msgType,grp
+                                grp?.chat[grp.chat.length - 1]?.msgType, grp
                               )}
                             </div>
                           </div>
@@ -633,11 +645,10 @@ const Home = () => {
 
           {/* center line */}
           <div
-            className={`h-full hidden md:block md:absolute right-[-0px] top-0 cursor-ew-resize border border-[#fff1d513] rounded ${
-              isDragging
+            className={`h-full hidden md:block md:absolute right-[-0px] top-0 cursor-ew-resize border border-[#fff1d513] rounded ${isDragging
                 ? "w-0.5 bg-blue-500"
                 : "hover:w-1 hover: bg-neutral-400"
-            } `}
+              } `}
             onMouseDown={handleMouseDown}
           ></div>
         </div>
@@ -661,9 +672,8 @@ const Home = () => {
         {/* rightBox */}
         <div
           ref={rightBoxRef}
-          className={`h-full  md:block  border-dotted rounded-l-2xl md:rounded-l-none rounded-r-2xl bg-[#ffffff2a] relative  md:min-w-100 ${
-            groupNo === null ? "hidden" : ""
-          } `}
+          className={`h-full  md:block  border-dotted rounded-l-2xl md:rounded-l-none rounded-r-2xl bg-[#ffffff2a] relative  md:min-w-100 ${groupNo === null ? "hidden" : ""
+            } `}
           style={
             !isSmallScreen ? { width: `${sizes.right}vw` } : { width: "100%" }
           }
@@ -710,10 +720,11 @@ const Home = () => {
                       className="border-r border-gray-500 pr-1.5 cursor-pointer"
                       onClick={(e) => {
                         e.preventDefault();
+                        handleVideoCall();
                       }}
                     >
                       <img
-                        src={videoCall}
+                        src={videoCallImg}
                         className="w-6 md:w-9 mr-1.5 cursor-pointer active:scale-90"
                       />
                     </button>
@@ -730,11 +741,10 @@ const Home = () => {
               </div>
 
               <div
-                className={`absolute top-2 left-2 bg-[#02061892] backdrop-blur-xl   overflow-y-scroll pr-5  ${
-                  OpenGroupInfo
+                className={`absolute top-2 left-2 bg-[#02061892] backdrop-blur-xl   overflow-y-scroll pr-5  ${OpenGroupInfo
                     ? "opacity-100 h-120 w-80 left-0 rounded-lg"
                     : "opacity-0 h-0 w-0 left-40 rounded-4xl no-scrollbar"
-                } transition-all duration-400 ease-in z-90`}
+                  } transition-all duration-400 ease-in z-90`}
               >
                 <GroupInfo
                   group={user?.group?.find(
@@ -759,17 +769,14 @@ const Home = () => {
                   .map((m, index) => (
                     <div
                       key={index}
-                      className={`${
-                        user.id === m?.senderId
+                      className={`${user.id === m?.senderId
                           ? "self-end flex-row-reverse"
                           : "self-start"
-                      } w-fit text-white flex gap-5 `}
+                        } w-fit text-white flex gap-5 `}
                       onMouseEnter={() => {
-                        console.log("Mouse entered:", m.id);
                         setToDeleteChat(m.id);
                       }}
                       onMouseLeave={() => {
-                        console.log("Mouse left:", m.id);
                         setToDeleteChat(null);
                       }}
                     >
@@ -781,11 +788,10 @@ const Home = () => {
                           />
                         )}
                         <div
-                          className={`${
-                            m?.senderId === user?.id
+                          className={`${m?.senderId === user?.id
                               ? "bg-gradient-to-r from-indigo-800  to-purple-800 rounded-tr-none"
                               : "bg-blue-950 rounded-tl-none"
-                          } min-w-30 rounded-xl `}
+                            } min-w-30 rounded-xl `}
                         >
                           <div className="">
                             <div className="text-xs italic text-amber-400 pl-2 pt-2 ">
@@ -879,9 +885,8 @@ const Home = () => {
                     )}
                   </label>
                   <div
-                    className={`absolute bottom-20 left-2 rounded overflow-hidden border-y-10 border-x-5 border-gray-600 bg-gray-600 flex ${
-                      !file && "hidden"
-                    }`}
+                    className={`absolute bottom-20 left-2 rounded overflow-hidden border-y-10 border-x-5 border-gray-600 bg-gray-600 flex ${!file && "hidden"
+                      }`}
                   >
                     {renderPreview()}
                   </div>
