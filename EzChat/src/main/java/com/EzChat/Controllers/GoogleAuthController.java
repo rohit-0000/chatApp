@@ -4,12 +4,14 @@ package com.EzChat.Controllers;
 import com.EzChat.Entity.User;
 import com.EzChat.Repository.UserRepo;
 import com.EzChat.Services.UserDetailServiceImp;
+import com.EzChat.Services.UserServices;
 import com.EzChat.Utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,9 +48,12 @@ public class GoogleAuthController {
     private JwtUtils jwtUtils;
     @Autowired
     private UserDetailServiceImp userDetailServiceImp;
+    @Autowired
+    private UserServices userServices;
 
 
     @GetMapping("/callback")
+    @Transactional
     public ResponseEntity<?> handleGoogleCallback(@RequestParam String code){
         try{
             String tokenEndpoint = "https://oauth2.googleapis.com/token";
@@ -78,9 +83,9 @@ public class GoogleAuthController {
                     user.setEmail(email);
                     user.setUserName(email);
                     user.setName((String)userInfo.get("name"));
-                    user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                    user.setPassword(UUID.randomUUID().toString());
                     user.setRoles(Arrays.asList("USER"));
-                    userRepo.save(user);
+                    userServices.createNewUser(user);
                 }
 //                UsernamePasswordAuthenticationToken authentication =
 //                        new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());

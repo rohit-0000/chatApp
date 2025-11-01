@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { set, useForm } from "react-hook-form";
+import {  useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
 import { findUser, sendEmail } from "../Reducer/chatSlice";
 import toast from "react-hot-toast";
 import Otp_verify from "./otp_verify"
@@ -24,18 +23,8 @@ const forgot_pass = () => {
       const emailData = {
         to: data.email,
         subject: "Email verification from EasyChat",
-        body: `Dear ${data.name},
-            
-              Your EasyChat verification code is:
-            
-              ${generatedOtp}
-            
-              Please enter this code in the app/website to verify your email address.
-            
-              If you didn’t request this, please ignore this email. For assistance, contact our support team at [rohitcollege212004@gmail.com].
-            
-              Best regards,
-              The EasyChat Team`,
+        body: generatedOtp,
+        name:data.name,
       };
       await dispatch(sendEmail(emailData));
       setOtpState({ data, generatedOtp })

@@ -4,13 +4,20 @@ package com.EzChat.Services;
 import com.EzChat.Entity.ChatRoom;
 import com.EzChat.Entity.User;
 import com.EzChat.Repository.UserRepo;
+import com.EzChat.Utils.MailUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -20,6 +27,8 @@ public class UserServices {
    public UserRepo userRepo;
    @Autowired
    private ChatRoomService chatRoomService;
+   @Autowired
+   private MailUtils mailUtils;
    private static final PasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
    public User findByUsername(String userName){
        return userRepo.findByUserName(userName);
@@ -27,10 +36,15 @@ public class UserServices {
    public User findByEmail(String email){
        return userRepo.findByEmail(email);
    }
-   public void createNewUser(User user){
+   @Transactional
+   public void createNewUser(User user) throws IOException {
        user.setPassword(passwordEncoder.encode(user.getPassword()));
        user.setRoles(Arrays.asList("USER"));
        userRepo.save(user);
+       String html = new String(Files.readAllBytes(Paths.get("src/main/resources/static/welcome.html")));
+       html = html.replace("{{name}}", user.getName());
+       html = html.replace("{{year}}", String.valueOf(LocalDateTime.now().getYear()));
+       mailUtils.sendMail(user.getEmail(), "Welcome to EZ Chat 🎉", html);
    }
 
    public ResponseEntity<?> updateUser(User newUser,User oldUser){

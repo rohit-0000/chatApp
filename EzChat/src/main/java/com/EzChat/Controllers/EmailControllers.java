@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/email")
 public class EmailControllers {
@@ -22,7 +26,11 @@ public class EmailControllers {
     @PostMapping("/send")
     public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest){
         try{
-                mailUtils.sendMail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getBody());
+                String html = new String(Files.readAllBytes(Paths.get("src/main/resources/static/emailVerification.html")));
+                html = html.replace("{{name}}", emailRequest.getName());
+                html = html.replace("{{year}}", String.valueOf(LocalDateTime.now().getYear()));
+                html = html.replace("{{otp}}", emailRequest.getBody());
+                mailUtils.sendMail(emailRequest.getTo(), emailRequest.getSubject(), html);
                 return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {

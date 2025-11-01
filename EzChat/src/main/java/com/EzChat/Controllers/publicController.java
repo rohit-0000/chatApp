@@ -13,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/public")
 @Slf4j
@@ -31,7 +33,7 @@ public class publicController {
        return new ResponseEntity<>("App is working fine",HttpStatus.OK);
    }
    @PostMapping("Signup")
-   ResponseEntity<?> Signup(@RequestBody User user){
+   ResponseEntity<?> Signup(@RequestBody User user) throws IOException {
        if(userServices.findByUsername(user.getUserName())!=null){
            return ResponseEntity
                    .status(HttpStatus.BAD_REQUEST)
